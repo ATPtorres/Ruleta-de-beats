@@ -1,0 +1,60 @@
+name: Beat Roulette Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/android-apk.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      FLUTTER_SUPPRESS_ANALYTICS: 'true'
+      DART_SUPPRESS_ANALYTICS: 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install verified Flutter SDK
+        shell: bash
+        run: |
+          curl --fail --silent --show-error --location --retry 3 \
+            https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.32.8-stable.tar.xz \
+            -o "$RUNNER_TEMP/flutter.tar.xz"
+          echo "c2c7d75f9be53f10f3fdba2f7e042b2ef0852cc088392b374bcec34c6204ed8c  $RUNNER_TEMP/flutter.tar.xz" | sha256sum --check
+          tar -xJf "$RUNNER_TEMP/flutter.tar.xz" -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+      - name: Prepare Android and Flutter dependencies
+        run: |
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;27.0.12077973'
+          flutter pub get --enforce-lockfile
+      - name: Analyze and test
+        run: |
+          flutter analyze --no-pub
+          flutter test --no-pub --reporter expanded
+      - name: Build and verify ARM64 APK
+        run: |
+          flutter build apk --release --no-pub --split-per-abi --target-platform android-arm64
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk Beat-Roulette-v1.0.0-arm64.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --min-sdk-version 33 Beat-Roulette-v1.0.0-arm64.apk
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging Beat-Roulette-v1.0.0-arm64.apk | tee apk-badging.txt
+          grep -Fx "native-code: 'arm64-v8a'" apk-badging.txt
+          sha256sum Beat-Roulette-v1.0.0-arm64.apk | tee Beat-Roulette-v1.0.0-arm64.apk.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Beat-Roulette-Android-ARM64
+          path: |
+            Beat-Roulette-v1.0.0-arm64.apk
+            Beat-Roulette-v1.0.0-arm64.apk.sha256
+          if-no-files-found: error
+          compression-level: 0
