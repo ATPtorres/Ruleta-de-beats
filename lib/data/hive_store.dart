@@ -1,12 +1,12 @@
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive/hive.dart';
 import '../domain/models.dart';
 
 class HiveStore implements BeatStore {
   HiveStore(this._history, this._rules, this._settings);
   final Box<Map> _history, _rules, _settings;
 
-  static Future<HiveStore> open() async {
-    await Hive.initFlutter();
+  static Future<HiveStore> open(String path) async {
+    Hive.init(path);
     final boxes = await Future.wait([
       Hive.openBox<Map>('history_v1'),
       Hive.openBox<Map>('rules_v1'),

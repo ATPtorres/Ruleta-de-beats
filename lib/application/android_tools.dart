@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 class AndroidTools {
   static const channel = MethodChannel('beat_roulette/android');
 
+  Future<String> storagePath() async =>
+      (await channel.invokeMethod<String>('storagePath'))!;
   Future<int> deadline() async =>
       await channel.invokeMethod<int>('deadline') ?? 0;
   Future<Map<String, bool>> status() async =>

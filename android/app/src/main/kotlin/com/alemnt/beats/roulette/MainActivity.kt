@@ -50,6 +50,7 @@ class MainActivity : FlutterActivity() {
             .setMethodCallHandler { call, result ->
                 try {
                     when (call.method) {
+                        "storagePath" -> result.success(filesDir.absolutePath)
                         "deadline" -> result.success(TimerAlarm.deadline(this))
                         "status" -> result.success(mapOf(
                             "notifications" to getSystemService(NotificationManager::class.java).areNotificationsEnabled(),
