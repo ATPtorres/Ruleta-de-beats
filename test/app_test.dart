@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:beat_roulette/application/android_tools.dart';
 import 'package:beat_roulette/application/state.dart';
 import 'package:beat_roulette/domain/models.dart';
@@ -50,8 +49,9 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     messenger.setMockMethodCallHandler(AndroidTools.channel, (call) async {
       if (call.method == 'deadline') return 0;
-      if (call.method == 'status')
+      if (call.method == 'status') {
         return {'notifications': true, 'exact': true};
+      }
       return null;
     });
     final store = _MemoryStore();
