@@ -1,6 +1,6 @@
 # Beat Roulette
 
-Una ruleta offline para salir del bloqueo creativo. Proyecto Flutter para Android 10 o superior. La distribución personal para un Android 13 ARM64 usa el APK arm64-v8a.
+Una ruleta offline para salir del bloqueo creativo. Proyecto Flutter para Android 10 o superior. La edición de pruebas de GitHub Actions ofrece un APK universal para ARM de 32 bits, ARM64 y x86-64.
 
 ## Primer reto
 
@@ -25,6 +25,12 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 El APK se genera en `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk`. Para obtener un APK universal, usa `flutter build apk --release`.
 
 Gradle firma la compilación personal con la clave de depuración del entorno. Para distribuir actualizaciones propias, configura y conserva una clave privada estable antes de instalar esa serie de versiones. Android exige la misma firma y el mismo ID de aplicación para una actualización directa.
+
+### APK de pruebas de GitHub
+
+El flujo **Beat Roulette Android APK** genera un APK universal de depuración firmada y lo instala en un emulador de Android 13. El paquete `com.alemnt.beats.roulette.pruebas` aparece como **Beat Roulette Pruebas** y puede convivir con la app original. Cada instalación tiene su propia base de datos local. La compilación estándar conserva `com.alemnt.beats.roulette`.
+
+Para reproducir la edición de pruebas, establece `ORG_GRADLE_PROJECT_beatRouletteInstallCheck=true` en el entorno y ejecuta `flutter build apk --release`.
 
 ## Arquitectura
 
